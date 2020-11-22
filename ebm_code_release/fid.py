@@ -100,7 +100,7 @@ def get_activations(images, sess, batch_size=50, verbose=False):
     # inception_layer = _get_inception_layer(sess)
     d0 = images.shape[0]
     if batch_size > d0:
-        print("warning: batch size is bigger than the data size. setting batch size to data size")
+        print("warning: batch size is bigger than the Data size. setting batch size to Data size")
         batch_size = d0
     n_batches = d0//batch_size
     n_used_imgs = n_batches*batch_size
@@ -131,11 +131,11 @@ def calculate_frechet_distance(mu1, sigma1, mu2, sigma2, eps=1e-6):
              inception net ( like returned by the function 'get_predictions')
              for generated samples.
     -- mu2   : The sample mean over activations of the pool_3 layer, precalcualted
-               on an representive data set.
+               on an representive Data set.
     -- sigma1: The covariance matrix over activations of the pool_3 layer for
                generated samples.
     -- sigma2: The covariance matrix over activations of the pool_3 layer,
-               precalcualted on an representive data set.
+               precalcualted on an representive Data set.
 
     Returns:
     --   : The Frechet Distance.

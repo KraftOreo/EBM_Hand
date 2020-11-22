@@ -45,7 +45,7 @@ flags.DEFINE_string('dataset','mnist',
 flags.DEFINE_integer('batch_size', 256, 'Size of inputs')
 flags.DEFINE_bool('single', False, 'whether to debug by training on a single image')
 flags.DEFINE_integer('data_workers', 4,
-    'Number of different data workers to load data in parallel')
+    'Number of different Data workers to load Data in parallel')
 
 # General Experiment Settings
 flags.DEFINE_string('logdir', 'cachedir',
@@ -532,7 +532,7 @@ def main():
         logger = None
 
     LABEL = None
-    print("Loading data...")
+    print("Loading Data...")
     if FLAGS.dataset == 'cifar10':
         dataset = Cifar10(augment=FLAGS.augment, rescale=FLAGS.rescale)
         test_dataset = Cifar10(train=False, rescale=FLAGS.rescale)

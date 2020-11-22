@@ -20,7 +20,7 @@ FLAGS = flags.FLAGS
 
 # Dataset Options
 flags.DEFINE_string('dsprites_path',
-    '/root/data/dsprites-dataset/dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz',
+    '/root/Data/dsprites-dataset/dsprites_ndarray_co1sh3sc6or40x32y32_64x64.npz',
     'path to dsprites characters')
 flags.DEFINE_string('imagenet_datadir',  '/root/imagenet_big', 'whether cutoff should always in image')
 flags.DEFINE_bool('dshape_only', False, 'fix all factors except for shapes')
@@ -35,7 +35,7 @@ flags.DEFINE_string('imagenet_path', '/root/imagenet', 'path to imagenet images'
 flags.DEFINE_bool('cutout_inside', False,'whether cutoff should always in image')
 flags.DEFINE_float('cutout_prob', 1.0, 'probability of using cutout')
 flags.DEFINE_integer('cutout_mask_size', 16, 'size of cutout')
-flags.DEFINE_bool('cutout', False,'whether to add cutout regularizer to data')
+flags.DEFINE_bool('cutout', False,'whether to add cutout regularizer to Data')
 
 
 def cutout(mask_color=(0, 0, 0)):
@@ -162,7 +162,7 @@ class TFImagenetLoader(Dataset):
 class CelebA(Dataset):
 
     def __init__(self):
-        self.path = "/root/data/img_align_celeba"
+        self.path = "/root/Data/img_align_celeba"
         self.ims = os.listdir(self.path)
         self.ims = [osp.join(self.path, im) for im in self.ims]
 
@@ -483,10 +483,10 @@ class Imagenet(Dataset):
                         'rb'))
                 if i == 1:
                     labels = f['labels']
-                    data = f['data']
+                    data = f['Data']
                 else:
                     labels.extend(f['labels'])
-                    data = np.vstack((data, f['data']))
+                    data = np.vstack((data, f['Data']))
         else:
             f = pickle.load(
                 open(
@@ -495,7 +495,7 @@ class Imagenet(Dataset):
                         'val_data'),
                     'rb'))
             labels = f['labels']
-            data = f['data']
+            data = f['Data']
 
         self.labels = labels
         self.data = data
@@ -530,7 +530,7 @@ class Imagenet(Dataset):
 
 class Textures(Dataset):
     def __init__(self, train=True, augment=False):
-        self.dataset = ImageFolder("/mnt/nfs/yilundu/data/dtd/images")
+        self.dataset = ImageFolder("/mnt/nfs/yilundu/Data/dtd/images")
 
     def __len__(self):
         return 2 * len(self.dataset)

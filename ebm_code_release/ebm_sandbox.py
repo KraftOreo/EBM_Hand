@@ -32,7 +32,7 @@ flags.DEFINE_string('task', 'label', 'using conditional energy based models for 
                     'or mixenergy to evaluate out of distribution generalization compared to other datasets')
 flags.DEFINE_bool('hessian', True, 'Whether to use the hessian or the Jacobian for latent traversals')
 flags.DEFINE_string('exp', 'default', 'name of experiments')
-flags.DEFINE_integer('data_workers', 5, 'Number of different data workers to load data in parallel')
+flags.DEFINE_integer('data_workers', 5, 'Number of different Data workers to load Data in parallel')
 flags.DEFINE_integer('batch_size', 32, 'Size of inputs')
 flags.DEFINE_integer('resume_iter', -1, 'iteration to resume training from')
 flags.DEFINE_bool('bn', False, 'Whether to use batch normalization or not')

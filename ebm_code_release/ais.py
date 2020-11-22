@@ -16,7 +16,7 @@ flags.DEFINE_string('datasource', 'random', 'default or noise or negative or sin
 flags.DEFINE_string('dataset', 'cifar10', 'cifar10 or mnist or dsprites or 2d or toy Gauss')
 flags.DEFINE_string('logdir', 'cachedir', 'location where log of experiments will be stored')
 flags.DEFINE_string('exp', 'default', 'name of experiments')
-flags.DEFINE_integer('data_workers', 5, 'Number of different data workers to load data in parallel')
+flags.DEFINE_integer('data_workers', 5, 'Number of different Data workers to load Data in parallel')
 flags.DEFINE_integer('batch_size', 16, 'Size of inputs')
 flags.DEFINE_string('resume_iter', '-1', 'iteration to resume training from')
 
