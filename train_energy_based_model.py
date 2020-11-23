@@ -33,17 +33,18 @@ X_train, X_test, X_val = data_reader.training_data, data_reader.test_data, data_
 # X_val = sample_2d_data(args.dataset, N_val)
 # X_test = sample_2d_data(args.dataset, N_test)
 
-train_dl = DataLoader(TensorDataset(X_train), batch_size=32, shuffle=True,)
-val_dl = DataLoader(TensorDataset(X_train), batch_size=32, shuffle=True,  )
-test_dl = DataLoader(TensorDataset(X_train), batch_size=32, shuffle=True, )
+train_dl = DataLoader(TensorDataset(X_train), batch_size=32, shuffle=True, num_workers=8)
+val_dl = DataLoader(TensorDataset(X_train), batch_size=32, shuffle=True,  num_workers=8)
+test_dl = DataLoader(TensorDataset(X_train), batch_size=32, shuffle=True, num_workers=8)
 
 # build model
+model = None
 if args.model == 'FCNet':
     model = FCNet(in_dim=20, out_dim=1, l_hidden=(100, 100), activation='relu', out_activation='linear')
 elif args.model == 'ConvNet':
     model = ConvNet(in_chan=1, out_chan=1)
-# if torch.cuda.is_available:
-#     model.cuda()
+if torch.cuda.is_available:
+    model.cuda()
 
 opt = Adam(model.parameters(), lr=args.lr)
     
@@ -52,8 +53,8 @@ for i_epoch in range(args.n_epoch):
     l_loss = []
     for pos_x, in train_dl:
 
-        # pos_x = pos_x.cuda()
-        pos_x = pos_x
+        pos_x = pos_x.cuda()
+        # pos_x = pos_x
         
         neg_x = torch.randn_like(pos_x)
         neg_x = sample_langevin(neg_x, model, args.stepsize, args.n_step, intermediate_samples=False)
@@ -61,7 +62,6 @@ for i_epoch in range(args.n_epoch):
         opt.zero_grad()
         pos_out = model(pos_x)
         neg_out = model(neg_x)
-        print(pos_out, neg_out)
         loss = (pos_out - neg_out) + args.alpha * (pos_out ** 2 + neg_out ** 2)
         loss = loss.mean()
         loss.backward()
