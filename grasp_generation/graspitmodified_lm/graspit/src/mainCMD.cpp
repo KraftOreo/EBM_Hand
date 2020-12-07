@@ -212,7 +212,7 @@ int main(int argc, char **argv)
   parsed_args.add<std::string>("resultFile");
   parsed_args.add<int>("maxStep",0,"",true,70000);
   // Add by Jian Liu
-  parsed_args.add<std::string>("EGEnergy",0,"",true,"CONTACT_ENERGY");//CONTACT_ENERGY
+  parsed_args.add<std::string>("EGEnergy",0,"",true,"EBM_GUIDED_AUTO_GRASP_QUALITY_ENERGY");//CONTACT_ENERGY
   //parsed_args.add<std::string>("EGEnergy",0,"",true,"STRICT_AUTO_GRASP_ENERGY");
   parsed_args.parse(argc,argv);
 
@@ -254,10 +254,10 @@ int main(int argc, char **argv)
 
   planner.setModelState(&state);
   std::string energy=parsed_args.get<std::string>("EGEnergy");
-  if(energy == "CONTACT_ENERGY" || energy == "POTENTIAL_QUALITY_ENERGY" ||
-     energy == "AUTO_GRASP_QUALITY_ENERGY" || energy == "GUIDED_POTENTIAL_QUALITY_ENERGY" ||
-     energy == "GUIDED_AUTO_GRASP_QUALITY_ENERGY" || energy == "STRICT_AUTO_GRASP_ENERGY" ||
-     energy == "COMPLIANT_ENERGY" || energy == "DYNAMIC_AUTO_GRASP_ENERGY")
+  if(energy == "CONTACT_ENERGY" || energy == "POTENTIAL_QUALITY_ENERGY" || 
+     energy == "EBM_GUIDED_AUTO_GRASP_QUALITY_ENERGY" || energy == "AUTO_GRASP_QUALITY_ENERGY" || 
+     energy == "GUIDED_POTENTIAL_QUALITY_ENERGY" || energy == "GUIDED_AUTO_GRASP_QUALITY_ENERGY" || 
+     energy == "STRICT_AUTO_GRASP_ENERGY" || energy == "COMPLIANT_ENERGY" || energy == "DYNAMIC_AUTO_GRASP_ENERGY")
     planner.setEnergyType(energy);
   else {
     std::cout << "Unknown energy type: " << energy << std::endl;
