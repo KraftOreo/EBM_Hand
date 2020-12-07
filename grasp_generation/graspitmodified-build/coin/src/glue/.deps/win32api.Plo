@@ -1,0 +1,13 @@
+win32api.lo: \
+ ../../../../graspitmodified_lm/Coin-3.1.3/src/glue/win32api.cpp \
+ /usr/include/stdc-predef.h ../../src/config.h \
+ ../../../../graspitmodified_lm/Coin-3.1.3/src/unconfig.h \
+ ../../src/setup.h
+
+/usr/include/stdc-predef.h:
+
+../../src/config.h:
+
+../../../../graspitmodified_lm/Coin-3.1.3/src/unconfig.h:
+
+../../src/setup.h:

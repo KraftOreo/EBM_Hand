@@ -1,0 +1,6 @@
+<root>
+   <material>plastic</material>
+   <mass>100</mass>
+   <cog>0 0 0</cog>
+   <geometryFile type="off">bigbird_nutrigrain_fruit_crunch_strawberry_parfait.off</geometryFile>
+</root>

@@ -1,0 +1,5 @@
+3ds-dummy.lo: \
+ ../../../../graspitmodified_lm/Coin-3.1.3/src/3ds/3ds-dummy.cpp \
+ /usr/include/stdc-predef.h
+
+/usr/include/stdc-predef.h:

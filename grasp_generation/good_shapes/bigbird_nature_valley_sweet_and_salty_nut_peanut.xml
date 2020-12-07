@@ -1,0 +1,6 @@
+<root>
+   <material>plastic</material>
+   <mass>100</mass>
+   <cog>0 0 0</cog>
+   <geometryFile type="off">bigbird_nature_valley_sweet_and_salty_nut_peanut.off</geometryFile>
+</root>

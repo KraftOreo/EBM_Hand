@@ -5,11 +5,11 @@ import torch
 class DataReader:
     def __init__(self, path, shuffle=True, split_percentage=None):
         if split_percentage is None:
-            split_percentage = {'train': 0.7, 'test': 0.2, 'validation': 0.1}
+            split_percentage = {'train': 0.8, 'test': 0.2}
         self.path = path
         self.shuffle = shuffle
         self.data = self.load_data_torch()
-        self.training_data, self.test_data, self.validation_data = self.split(split_percentage)
+        self.training_data, self.test_data = self.split(split_percentage)
 
     def load_data_torch(self):
         data = []

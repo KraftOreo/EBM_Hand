@@ -18,14 +18,14 @@ def sample_langevin(x, model, stepsize, n_steps, noise_scale=None, intermediate_
     l_dynamics = []
     x.requires_grad = True
     for _ in range(n_steps):
-        l_samples.append(x.detach().to('cpu'))
+        l_samples.append(x.detach())
         noise = torch.randn_like(x) * noise_scale
         out = model(x)
         grad = autograd.grad(out.sum(), x, only_inputs=True)[0]
         dynamics = stepsize * grad + noise
         x = x + dynamics
-        l_samples.append(x.detach().to('cpu'))
-        l_dynamics.append(dynamics.detach().to('cpu'))
+        l_samples.append(x.detach())
+        l_dynamics.append(dynamics.detach())
 
     if intermediate_samples:
         return l_samples, l_dynamics

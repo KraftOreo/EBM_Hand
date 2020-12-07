@@ -1,0 +1,6 @@
+<root>
+   <material>plastic</material>
+   <mass>100</mass>
+   <cog>0 0 0</cog>
+   <geometryFile type="off">bigbird_white_rain_sensations_ocean_mist_hydrating_conditioner.off</geometryFile>
+</root>
