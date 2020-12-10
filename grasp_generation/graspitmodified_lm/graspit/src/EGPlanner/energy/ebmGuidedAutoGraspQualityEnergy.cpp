@@ -1,12 +1,13 @@
-#include "graspit/EGPlanner/energy/ebmguidedAutoGraspEnergy.h"
+#include <Python.h>
+#include "graspit/EGPlanner/energy/ebmGuidedAutoGraspQualityEnergy.h"
 #include "graspit/robot.h"
 #include "graspit/grasp.h"
 #include "graspit/debug.h"
 #include "graspit/world.h"
-#include "graspit/quality/quality.h"
 #include "graspit/contact/virtualContact.h"
-#include <python3.7/Python.h>
-
+#include "graspit/quality/quality.h"
+#include <iostream>
+#include <string.h>
 /**
  * @brief This formulation combines virtual contact energy with autograsp energy. In addition, it computes EBM-based energy to access human-like grasping. 
     Virtual contact energy is used to "guide" initial stages of the search and to see if we should even bother computing autograsp quality. 
@@ -32,7 +33,7 @@ EBMGuidedAutoGraspQualityEnergy::energy() const
   //average error per contact
   VirtualContact *contact;
   vec3 p, n, cn;
-  double virtualError = 0;
+  double virtualError = 0; int closeContacts = 0;
   for (int i = 0; i < mHand->getGrasp()->getNumContacts(); i++)
   {
     contact = (VirtualContact *)mHand->getGrasp()->getContact(i);
@@ -47,27 +48,32 @@ EBMGuidedAutoGraspQualityEnergy::energy() const
     n = p.normalized();
     double d = 1 - cn.dot(n);
     virtualError += d * 100.0 / 2.0;
+
+    if (fabs(dist) < 20 && d < 0.3) { closeContacts++; }
   }
 
-  totalError /= mHand->getGrasp()->getNumContacts();
+  virtualError /= mHand->getGrasp()->getNumContacts();
 
-  /**
-   * @brief EBM-based energy computation. 
-   * Ebm enery is negtive and the smaller enery value implys that the generated grasp is more human-like.
-   * @author Jian Liu
-   */
-  double* dofVals;
+  double *dofVals = new double[mHand->getNumDOF()];
   mHand->getDOFVals(dofVals);
   double ebmQuality = 0;
-  ebmQuality = ebm_pythonInterface(dofVals,mHand->numDOF,mHand->getEBMPath());
-
+  
+  //std::cout<<mHand->getNumDOF()<<std::endl;
+  // for(int i=0;i<mHand->getNumDOF();i++){
+  //   std::cout<<dofVals[i]<<std::endl;
+  //   }
+  //std::cout<<mHand->getEBMPath()<<std::endl;
+  ebmQuality = ebm_pythonInterface(dofVals,mHand->getNumDOF(),mHand->getEBMPath());
+  
   //if more than 2 links are "close" go ahead and compute the true quality
   double volQuality = 0, epsQuality = 0;
-  if (closeContacts >= 2) {
+  if (closeContacts >= 2) 
+  {
     mHand->autoGrasp(false, 1.0);
     //now collect the true contacts;
-    mHand->getGrasp()->collectContactgetNumContactss();
-    if (mHand->getGrasp()->() >= 4) {
+    mHand->getGrasp()->collectContacts();
+    if (mHand->getGrasp()->getNumContacts() >= 4) 
+    {
       mHand->getGrasp()->updateWrenchSpaces();
       volQuality = mVolQual->evaluate();
       epsQuality = mEpsQual->evaluate();
@@ -80,7 +86,7 @@ EBMGuidedAutoGraspQualityEnergy::energy() const
   }
 
   double q;
-  if (volQuality == 0) { q = virtualError; }
+  if (volQuality == 0) { q = virtualError + ebmQuality * 1.0e3; }
   else { q = virtualError - volQuality * 1.0e3 + ebmQuality * 1.0e3; }
   if (volQuality || epsQuality) {DBGP("Final quality: " << q);}
 
@@ -92,27 +98,62 @@ double
 EBMGuidedAutoGraspQualityEnergy::ebm_pythonInterface(double* dofVals, int numDOF, std::string modelPath) const
 {
   Py_Initialize();
+  if (!Py_IsInitialized())
+	{
+		std::cout << "Failed to initialize" << std::endl;
+		return 0;
+	}
   PyRun_SimpleString("import sys");
-  PyRun_SimpleString("sys.path.append('./')");//python脚本路径, 放在cpp的同一路径下
+  // PyRun_SimpleString("sys.path.append('./')");//python脚本路径, 放在cpp的同一路径下
+  PyRun_SimpleString("sys.path.append('/home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit/src/EGPlanner/energy/')");//python脚本路径, 放在cpp的同一路径下
+  //PyRun_SimpleString("print(sys.path)");
+  PyRun_SimpleString("import ebmPythonInterface");
+
   PyObject *pModule = NULL;
   PyObject *pFunc = NULL;
-  pModule = PyImport_ImportModule("ebmPythonInterface");      //Python文件名
+  PyObject *pDict = NULL;
+  pModule = PyImport_ImportModule("ebmPythonInterface");//Python文件名
+
+  if (!pModule)
+	{
+		std::cout << "Cannot find ebmPythonInterface.py" << std::endl;
+    return 0;
+	}
+
+  pDict = PyModule_GetDict(pModule);//加载文件中的函数名
+	if (!pDict)
+	{
+		std::cout << "Cant find dictionary" << std::endl;
+		return 0;
+  }
+  
+	pFunc = PyDict_GetItemString(pDict, "dof_ebm");//根据函数名获得函数功能块，‘dof_ebm‘为Python中定义的函数名
+	if (!pFunc)
+	{
+		printf("Cant find Function. dof_ebm /n");
+    return 0;
+	}
+
+
   pFunc = PyObject_GetAttrString(pModule, "dof_ebm"); //Python文件中的函数名
   //创建参数:
-  PyObject *pArgs = PyTuple_New(2);                 //函数调用的参数传递均是以元组的形式打包的,2表示参数个数
-  PyObject* list_dof = PyList_New(0);
+  PyObject *pArgs = PyTuple_New(2); //函数调用的参数传递均是以元组的形式打包的,2表示参数个数
+  PyObject *list_dof = PyList_New(0);
 
-  for (size_t i = 0; i < numDOF; i++){
-    PyList_Append( list_dof , Py_BuildValue("d", dofVals[i]));// d表示转换成Python的浮点数
+  for(int i=0; i<numDOF; i++)
+  {
+   PyList_Append(list_dof,Py_BuildValue("d",dofVals[i]*57.3));
   }
+  
+  PyTuple_SetItem(pArgs,0,list_dof);
+  PyTuple_SetItem(pArgs,1,Py_BuildValue("s",modelPath.c_str()));
 
-  PyTuple_SetItem(pArgs, 0,  list_dof ); //0--序号
-  PyTuple_SetItem(pArgs, 1, Py_BuildValue("s", modelPath)); //1--序号, s表示转换成Python字符串
   //返回值
   PyObject *pReturn = NULL;
   pReturn = PyEval_CallObject(pFunc, pArgs); //调用函数
   //将返回值转换为double类型
   double result;
   PyArg_Parse(pReturn, "d", &result); //d表示转换成double型变量
+  std::cout<<"ebm value: "<<result<<std::endl;
   Py_Finalize();
 }

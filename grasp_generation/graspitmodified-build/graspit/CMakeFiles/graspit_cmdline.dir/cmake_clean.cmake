@@ -1,7 +1,7 @@
 file(REMOVE_RECURSE
   "CMakeFiles/graspit_cmdline.dir/src/mainCMD.cpp.o"
-  "graspit_cmdline.pdb"
   "graspit_cmdline"
+  "graspit_cmdline.pdb"
 )
 
 # Per-language clean rules from dependency scanning.

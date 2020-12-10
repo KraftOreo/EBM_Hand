@@ -67,49 +67,45 @@ def gen_script_for_each_xml(root_path, robot_xml_path, xml_name, built_binary_pa
     elements = re.split('/', xml_name)
     sub_path = gen_scripts_path + '/' + elements[len(elements) - 1]
     mkdir(root_path + '/' + sub_path)
-    if os.path.exists(sub_path + '/run.sh'):
-        print('Detected Script: ' + root_path + '/' + sub_path + '/run.sh')
-    else:
-        print('Generating Script: ' + root_path + '/' + sub_path + '/run.sh')
-
+    # if os.path.exists(sub_path + '/run.sh'):
+    #     print('Detected Script: ' + root_path + '/' + sub_path + '/run.sh')
+    # else:
+    #     print('Generating Script: ' + root_path + '/' + sub_path + '/run.sh')
+    if True:
         f = open(root_path + '/' + sub_path + '/run.sh', 'w')
         script = ''
-        sub_xmlFile = []
-        for j in range(1):
-            for k in range(1):
-                for m in range(1):
+        num_run = 10 # The number of times the algorithm is called
+        for j in range(num_run):
+            if os.path.exists(root_path + '/' + sub_path + '/' + elements[len(elements)-1] + '_' + str(j)):
+                print('Detected Filefold: ' + root_path + '/' + sub_path + '/' + elements[len(elements)-1] + '_' + str(j))
+            else:
+                mkdir(root_path + '/' + sub_path + '/' + elements[len(elements)-1] + '_' + str(j))
 
-                    if os.path.exists(root_path + '/' + sub_path + '/' + elements[len(elements)-1] + '_' + str(j) + '_' + str(k) + '_' + str(m)):
-                        print('Detected Filefold: ' + root_path + '/' + sub_path + '/' + elements[len(elements)-1] + '_' + str(j) + '_' + str(k) + '_' + str(m))
-                    else:
-                        mkdir(root_path + '/' + sub_path + '/' + elements[len(elements)-1] + '_' + str(j) + '_' + str(k) + '_' + str(m))
+            robot_zrot = math.pi / (j + 1)  # radians
+            robot_yrot = robot_zrot
+            robot_xrot = robot_zrot
+            # print(robot_xrot, robot_yrot, robot_zrot)
+            # print('--------------------------------')
+            robot_R = transforms3d.taitbryan.euler2mat(robot_zrot, robot_yrot, robot_xrot)  # rotations
+            robot_coor_T_R = np.matmul(robot_R, robot_ori_tran)
+            robot_quat2mat = transforms3d.quaternions.quat2mat(robot_ori_quat)
+            robot_quat2mat_R = np.matmul(robot_R, robot_quat2mat)
+            robot_mat2quat = transforms3d.quaternions.mat2quat(robot_quat2mat_R)
 
-                    robot_zrot = math.pi / (j + 1)  # radians
-                    robot_yrot = math.pi / (k + 1)
-                    robot_xrot = math.pi / (m + 1)
-                    # print(robot_xrot, robot_yrot, robot_zrot)
-                    # print('--------------------------------')
-                    robot_R = transforms3d.taitbryan.euler2mat(robot_zrot, robot_yrot, robot_xrot)  # rotations
-                    robot_coor_T_R = np.matmul(robot_R, robot_ori_tran)
-                    robot_quat2mat = transforms3d.quaternions.quat2mat(robot_ori_quat)
-                    robot_quat2mat_R = np.matmul(robot_R, robot_quat2mat)
-                    robot_mat2quat = transforms3d.quaternions.mat2quat(robot_quat2mat_R)
-
-                    script += root_path + '/' + built_binary_path + ' '
-                    script += '--bodyFile=' + xml_name + ' '
-                    script += '--bodyRot=1,0,0,0 '
-                    script += '--bodyTrans=0,0,0 '
-                    script += '--robotFile=' + root_path + '/' + robot_xml_path + ' '
-                    script += '--robotRot=' + str(robot_mat2quat[0]) + ',' + str(robot_mat2quat[1]) + ',' + str(robot_mat2quat[2]) + ',' + str(robot_mat2quat[3]) + ' '
-                    script += '--robotTrans=' + str(robot_coor_T_R[0]) + ',' + str(robot_coor_T_R[1]) + ',' + str(robot_coor_T_R[2]) + ' '
-                    # Run a interface to compute a initial human hand by EBM
-                    script += dof_ebm()
-                    script += '--resultFile=' + root_path + '/' + sub_path + '/' + elements[len(elements)-1] + '_' + str(j) + '_' + str(k) + '_' + str(m) + '/ '
-                    
-                    script += "--modelPath=" + model_path + '\n'
-                    script += 'cp -r ' + root_path + '/' + sub_path + '/' + elements[len(elements)-1] + '_' + str(j) + '_' + str(k) + '_' + str(m) + ' '
-                    script += root_path + '/' + result_path + '\n\n'
-
+            script += root_path + '/' + built_binary_path + ' '
+            script += '--bodyFile=' + xml_name + ' '
+            script += '--bodyRot=1,0,0,0 '
+            script += '--bodyTrans=0,0,0 '
+            script += '--robotFile=' + root_path + '/' + robot_xml_path + ' '
+            script += '--robotRot=' + str(robot_mat2quat[0]) + ',' + str(robot_mat2quat[1]) + ',' + str(robot_mat2quat[2]) + ',' + str(robot_mat2quat[3]) + ' '
+            script += '--robotTrans=' + str(robot_coor_T_R[0]) + ',' + str(robot_coor_T_R[1]) + ',' + str(robot_coor_T_R[2]) + ' '
+            # Run a interface to compute a initial human hand by EBM
+            script += dof_ebm()
+            script += '--resultFile=' + root_path + '/' + sub_path + '/' + elements[len(elements)-1] + '_' + str(j) + '/ '
+                
+            script += "--modelPath=" + model_path + '\n'
+            script += 'cp -r ' + root_path + '/' + sub_path + '/' + elements[len(elements)-1] + '_' + str(j) + ' '
+            script += root_path + '/' + result_path + '\n\n'
         f.write(script)
         f.close()
 
@@ -233,6 +229,7 @@ def read_dof_XML(xml_name):
 
     return dofValues, quat, trans
 
+
 def read_dof_grasp(sub_xmlFile):
     for file in sub_xmlFile:
         for i in range(20):
@@ -267,7 +264,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=os.path.basename(__file__))
     parser.add_argument('--testRun', default=False,action='store_true')
     parser.add_argument('--root_path', default=os.path.dirname(os.path.realpath(__file__)))
-    parser.add_argument('--object_xml_path', default='vr_shapes')
+    parser.add_argument('--object_xml_path', default='../vr_shapes')
     parser.add_argument('--robot_xml_path', default='graspitmodified_lm/graspit/models/robots/HumanHand/HumanHand20DOF.xml')
     parser.add_argument('--built_binary_path', default='graspitmodified-build/graspit/graspit_cmdline')
     parser.add_argument('--gen_scripts_path', default='batch')

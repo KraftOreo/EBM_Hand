@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 3.12)#2.8.3
 project(graspit)
 
 
@@ -9,7 +9,10 @@ set(GRASPIT_VERSION
   ${GRASPIT_MAJOR_VERSION}.${GRASPIT_MINOR_VERSION}.${GRASPIT_PATCH_VERSION})
 
 #Add by Jian Liu
+find_package(Python3 COMPONENTS Development)
+include_directories(${Python3_INCLUDE_DIRS})
 #include_directories(/usr/include/python3.7)
+#link_directories(/usr/lib/x86_64-linux-gnu)
 
 ####################################
 ## Define build type ###############
@@ -242,6 +245,7 @@ set (GRASPIT_EGPLANNER_ENERGY_HEADERS
     ${GSRC}/include/graspit/EGPlanner/energy/guidedPotentialQualityEnergy.h
     ${GSRC}/include/graspit/EGPlanner/energy/potentialQualityEnergy.h
     ${GSRC}/include/graspit/EGPlanner/energy/strictAutoGraspEnergy.h
+    ${GSRC}/include/graspit/EGPlanner/energy/ebmGuidedAutoGraspQualityEnergy.h
 )
 
 set (GRASPIT_CONTACT_HEADERS
@@ -538,6 +542,7 @@ set (GRASPIT_CORE_SOURCES
     ${GSRC}/src/EGPlanner/energy/guidedPotentialQualityEnergy.cpp 
     ${GSRC}/src/EGPlanner/energy/potentialQualityEnergy.cpp 
     ${GSRC}/src/EGPlanner/energy/strictAutoGraspEnergy.cpp 
+    ${GSRC}/src/EGPlanner/energy/ebmGuidedAutoGraspQualityEnergy.cpp
     ${GSRC}/src/bodySensor.cpp
 )
 
@@ -915,13 +920,26 @@ set(GRASPIT_LINK_LIBRARIES
    ${GUROBI_LIBRARIES}
    ${GUROBI_CPP_LIBRARIES}
 )
+set(GRASPIT_CMDLINE_LINK_LIBRARIES
+   ${QT_LIBRARIES}
+   ${QT_QT3SUPPORT_LIBRARY}
+   #${QHULL_LIBRARIES}
+   ${SOQT_LIBRARY_RELEASE}
+   ${LAPACK_LIBRARIES}
+   ${BULLET_LIBRARIES}
+   ${QP_LIBRARIES}
+   ${GUROBI_LIBRARIES}
+   ${GUROBI_CPP_LIBRARIES}
+   ${Python3_LIBRARIES}
+)
 #message(STATUS "SoQT: ${SOQT_LIBRARY_RELEASE}")
 
 ## Link the shared library and the executable
-target_link_libraries(graspit ${GRASPIT_LINK_LIBRARIES})
+target_link_libraries(graspit ${GRASPIT_CMDLINE_LINK_LIBRARIES})
+target_link_libraries(graspit_pose_refine graspit ${GRASPIT_CMDLINE_LINK_LIBRARIES})
 #target_link_libraries(graspit_simulator graspit ${GRASPIT_LINK_LIBRARIES})
-target_link_libraries(graspit_cmdline graspit ${GRASPIT_LINK_LIBRARIES})
-target_link_libraries(graspit_pose_refine graspit ${GRASPIT_LINK_LIBRARIES})
+target_link_libraries(graspit_cmdline graspit ${GRASPIT_CMDLINE_LINK_LIBRARIES})
+
 ## Set install destination paths
 set ( INCLUDE_DESTINATION ${CMAKE_INSTALL_PREFIX}/include/)
 set ( LIB_DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/)

@@ -210,18 +210,15 @@ int main(int argc, char **argv)
 {
   cmdline::parser parsed_args;
   parsed_args.add<std::string>("resultFile");
-  parsed_args.add<int>("maxStep",0,"",true,70000);
+  parsed_args.add<int>("maxStep",0,"",true, 40000);//70000
   // Add by Jian Liu
-  parsed_args.add<std::string>("EGEnergy",0,"",true,"EBM_GUIDED_AUTO_GRASP_QUALITY_ENERGY");//CONTACT_ENERGY
+  parsed_args.add<std::string>("EGEnergy",0,"",true,"CONTACT_ENERGY");//CONTACT_ENERGY
   //parsed_args.add<std::string>("EGEnergy",0,"",true,"STRICT_AUTO_GRASP_ENERGY");
   parsed_args.parse(argc,argv);
 
   std::cout<<parsed_args.get<std::string>("resultFile").c_str();
-   //std::string output_path;
+  //std::string output_path;
   output_path.assign(parsed_args.get<std::string>("resultFile").c_str());
-
-  std::cout<<output_path;
-
 
   //create core
   int argc_tmp=2;
@@ -234,7 +231,8 @@ int main(int argc, char **argv)
   loadBodyFile(core,argc,argv);
   loadRobotFile(core,argc,argv);
   std::string modelPath = loadModel(argc, argv);
- 
+  //std::cout<<modelPath;
+
   //planner
   if(core.getWorld()->getNumGB() == 0) {
     std::cout << "World has no graspable objects!" << std::endl;
@@ -284,7 +282,7 @@ int main(int argc, char **argv)
     exit(EXIT_FAILURE);
   }
   //Note: first four grasp candidates (20%) have smaller energy, we just choose the first four grasps. planner.getListSize()
-  for(int i=0; i<4; i++) {
+  for(int i=0; i<planner.getListSize(); i++) {
     const GraspPlanningState* state=planner.getGrasp(i);
     state->execute();
     //auto-grasp

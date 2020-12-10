@@ -1,0 +1,21 @@
+<?xml version="1.0" ?>
+<world>
+	<graspableBody>
+		<filename>/home/liujian/WorkSpace/EBM_Hand/grasp_generation/vr_shapes/43.xml</filename>
+		<transform>
+			<fullTransform>(+1 +0 +0 +0)[+0 +0 +0]</fullTransform>
+		</transform>
+	</graspableBody>
+	<robot>
+		<filename>/home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit/models/robots/HumanHand/HumanHand20DOF.xml</filename>
+		<dofValues>+0.0997677 +0.211715 -0.128283 -0.128283 -2.22454e-16 +0.0439843 +0.173495 -0.0889345 +0.0942461 -0.120783 +0.53853 +0.202109 -0.332482 +0.352967 +0.352967 +0.352967 -0.174533 -0.171732 +0.26875 +0.26875 </dofValues>
+		<transform>
+			<fullTransform>(+0.505404 +0.214643 -0.610851 -0.5704)[-57.9487 -166.769 +128.031]</fullTransform>
+		</transform>
+	</robot>
+	<camera>
+		<position>-17.7276 -51.1806 +448.662</position>
+		<orientation>+0 +0 +0 +1</orientation>
+		<focalDistance>+271.266</focalDistance>
+	</camera>
+</world>

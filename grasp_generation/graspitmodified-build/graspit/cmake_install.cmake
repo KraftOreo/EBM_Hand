@@ -32,7 +32,17 @@ if(NOT DEFINED CMAKE_INSTALL_SO_NO_EXE)
   set(CMAKE_INSTALL_SO_NO_EXE "1")
 endif()
 
-if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
+# Is this installation the result of a crosscompile?
+if(NOT DEFINED CMAKE_CROSSCOMPILING)
+  set(CMAKE_CROSSCOMPILING "FALSE")
+endif()
+
+# Set default install directory permissions.
+if(NOT DEFINED CMAKE_OBJDUMP)
+  set(CMAKE_OBJDUMP "/usr/bin/objdump")
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   if(EXISTS "$ENV{DESTDIR}/usr/local/bin/graspit_pose_refine" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}/usr/local/bin/graspit_pose_refine")
     file(RPATH_CHECK
@@ -60,7 +70,7 @@ file(INSTALL DESTINATION "/usr/local/bin" TYPE EXECUTABLE FILES "/home/liujian/W
   endif()
 endif()
 
-if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   if(EXISTS "$ENV{DESTDIR}/usr/local/lib/libgraspit.so" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}/usr/local/lib/libgraspit.so")
     file(RPATH_CHECK
@@ -88,7 +98,10 @@ file(INSTALL DESTINATION "/usr/local/lib" TYPE SHARED_LIBRARY FILES "/home/liuji
   endif()
 endif()
 
-if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
    "/usr/local/include//graspit/")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
@@ -100,7 +113,7 @@ if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspeci
 file(INSTALL DESTINATION "/usr/local/include//graspit" TYPE DIRECTORY FILES "/home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit/include/graspit/")
 endif()
 
-if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
    "/usr/local/include/graspit/ui/ui_mainWindow.h;/usr/local/include/graspit/ui/ui_about.h;/usr/local/include/graspit/ui/ui_archBuilderDlg.h;/usr/local/include/graspit/ui/ui_barrettHandDlg.h;/usr/local/include/graspit/ui/ui_bodyPropDlg.h;/usr/local/include/graspit/ui/ui_contactExaminerDlg.h;/usr/local/include/graspit/ui/ui_eigenGraspDlg.h;/usr/local/include/graspit/ui/ui_gfoDlg.h;/usr/local/include/graspit/ui/ui_gloveCalibrationDlg.h;/usr/local/include/graspit/ui/ui_graspCaptureDlg.h;/usr/local/include/graspit/ui/ui_gwsProjDlgBase.h;/usr/local/include/graspit/ui/ui_qmDlg.h;/usr/local/include/graspit/ui/ui_qualityIndicator.h;/usr/local/include/graspit/ui/ui_settingsDlg.h;/usr/local/include/graspit/ui/ui_plannerdlg.h;/usr/local/include/graspit/ui/ui_egPlannerDlg.h;/usr/local/include/graspit/ui/ui_compliantPlannerDlg.h;/usr/local/include/graspit/ui/ui_dbaseDlg.h;/usr/local/include/graspit/ui/ui_dbasePlannerDlg.h")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
@@ -132,7 +145,7 @@ file(INSTALL DESTINATION "/usr/local/include/graspit/ui" TYPE FILE FILES
     )
 endif()
 
-if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   if(EXISTS "$ENV{DESTDIR}/usr/local/lib/libgraspit.so" AND
      NOT IS_SYMLINK "$ENV{DESTDIR}/usr/local/lib/libgraspit.so")
     file(RPATH_CHECK
@@ -160,7 +173,10 @@ file(INSTALL DESTINATION "/usr/local/lib" TYPE SHARED_LIBRARY PERMISSIONS OWNER_
   endif()
 endif()
 
-if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
+endif()
+
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   if(EXISTS "$ENV{DESTDIR}/usr/local/lib/cmake/graspit/graspitTargets.cmake")
     file(DIFFERENT EXPORT_FILE_CHANGED FILES
          "$ENV{DESTDIR}/usr/local/lib/cmake/graspit/graspitTargets.cmake"
@@ -195,7 +211,7 @@ file(INSTALL DESTINATION "/usr/local/lib/cmake/graspit" TYPE FILE FILES "/home/l
   endif()
 endif()
 
-if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "dev")
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xdevx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
    "/usr/local/lib/cmake/graspit/graspitConfig.cmake;/usr/local/lib/cmake/graspit/graspitConfigVersion.cmake;/usr/local/lib/cmake/graspit/FindBULLET.cmake;/usr/local/lib/cmake/graspit/FindSoQt4.cmake")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)
@@ -212,7 +228,7 @@ file(INSTALL DESTINATION "/usr/local/lib/cmake/graspit" TYPE FILE FILES
     )
 endif()
 
-if(NOT CMAKE_INSTALL_COMPONENT OR "${CMAKE_INSTALL_COMPONENT}" STREQUAL "Unspecified")
+if("x${CMAKE_INSTALL_COMPONENT}x" STREQUAL "xUnspecifiedx" OR NOT CMAKE_INSTALL_COMPONENT)
   list(APPEND CMAKE_ABSOLUTE_DESTINATION_FILES
    "/home/liujian/.graspit/worlds;/home/liujian/.graspit/models;/home/liujian/.graspit/images")
   if(CMAKE_WARN_ON_ABSOLUTE_INSTALL_DESTINATION)

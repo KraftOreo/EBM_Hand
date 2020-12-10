@@ -30,7 +30,7 @@
 #include "graspit/EGPlanner/energy/strictAutoGraspEnergy.h"
 #include "graspit/EGPlanner/energy/compliantEnergy.h"
 #include "graspit/EGPlanner/energy/dynamicAutoGraspEnergy.h"
-
+#include "graspit/EGPlanner/energy/ebmGuidedAutoGraspQualityEnergy.h"
 
 SearchEnergyFactory * SearchEnergyFactory::searchEnergyFactory = NULL;
 
@@ -46,6 +46,6 @@ SearchEnergyFactory::registerBuiltinCreators()
   REGISTER_SEARCH_ENERGY_CREATOR("COMPLIANT_ENERGY", CompliantEnergy);
   REGISTER_SEARCH_ENERGY_CREATOR("DYNAMIC_AUTO_GRASP_ENERGY", DynamicAutoGraspEnergy);
   //Add by Jian Liu
-  //REGISTER_SEARCH_ENERGY_CREATOR("EBM_GUIDED_AUTO_GRASP_QUALITY_ENERGY", EBMGuidedAutoGraspQualityEnergy);
+  REGISTER_SEARCH_ENERGY_CREATOR("EBM_GUIDED_AUTO_GRASP_QUALITY_ENERGY", EBMGuidedAutoGraspQualityEnergy);
 
 }

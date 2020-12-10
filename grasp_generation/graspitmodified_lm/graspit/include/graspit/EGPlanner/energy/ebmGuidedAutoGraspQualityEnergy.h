@@ -13,7 +13,6 @@ class EBMGuidedAutoGraspQualityEnergy: public SearchEnergy
 {
   public:
     double energy() const;
-  protected: 
   /**
    * @brief An interface to run EBM model.
    * 

@@ -1,3 +1,4 @@
+-I/usr/include/python3.7m
 -I/usr/include/qt4
 -I/usr/include/qt4/Qt3Support
 -I/usr/include/qt4/QtSql

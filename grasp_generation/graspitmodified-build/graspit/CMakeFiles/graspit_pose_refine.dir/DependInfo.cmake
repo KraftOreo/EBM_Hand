@@ -26,10 +26,7 @@ set(CMAKE_TARGET_DEFINITIONS_CXX
 
 # The include file search paths:
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
-  "/usr/include/qt4"
-  "/usr/include/qt4/Qt3Support"
-  "/usr/include/qt4/QtSql"
-  "/usr/include/qt4/QtCore"
+  "/usr/include/python3.7m"
   "/home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit"
   "/home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit/src/qhull/libqhull"
   "/home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit/include"
@@ -61,6 +58,10 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/usr/share/qt4/mkspecs/default"
   "/home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit/tinyxml"
   "/home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit/EIGEN3_INCLUDE_DIR"
+  "/usr/include/qt4"
+  "/usr/include/qt4/Qt3Support"
+  "/usr/include/qt4/QtSql"
+  "/usr/include/qt4/QtCore"
   )
 
 # Targets to which this target links.

@@ -49,6 +49,7 @@
 #include "graspit/EGPlanner/energy/dynamicAutoGraspEnergy.h"
 #include "graspit/EGPlanner/energy/compliantEnergy.h"
 #include "graspit/EGPlanner/energy/strictAutoGraspEnergy.h"
+#include "graspit/EGPlanner/energy/ebmGuidedAutoGraspQualityEnergy.h"
 
 //#define GRASPITDBG
 #include "graspit/debug.h"

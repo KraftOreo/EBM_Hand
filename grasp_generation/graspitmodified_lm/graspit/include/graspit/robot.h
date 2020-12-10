@@ -740,7 +740,7 @@ class Hand : public Robot {
     //Add by Jian Liu
     std::string m_ebmModelPath;
     void setEBMPath(std::string ebmModelPath) {m_ebmModelPath = ebmModelPath;}
-    std::string getEBMPath() const {return m_ebmModelPath;}
+    std::string getEBMPath() {return m_ebmModelPath;}
 
     //! Clones this hand from another
     virtual void cloneFrom(Hand *original);

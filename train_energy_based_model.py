@@ -16,6 +16,7 @@ from data import sample_2d_data
 import time
 from tqdm import tqdm
 
+
 parser = argparse.ArgumentParser()
 parser.add_argument('--dataset', choices=('8gaussians', '2spirals', 'checkerboard', 'rings', 'MNIST'), default='./Data/degree_data.txt')
 parser.add_argument('--model', choices=('FCNet', 'ConvNet'), default='FCNet')
