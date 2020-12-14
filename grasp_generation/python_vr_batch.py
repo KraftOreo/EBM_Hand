@@ -92,7 +92,8 @@ def gen_script_for_each_xml(root_path, robot_xml_path, xml_name, built_binary_pa
             robot_quat2mat_R = np.matmul(robot_R, robot_quat2mat)
             robot_mat2quat = transforms3d.quaternions.mat2quat(robot_quat2mat_R)
 
-            script += root_path + '/' + built_binary_path + ' '
+            #script += root_path + '/' + built_binary_path + ' '
+            script += built_binary_path + ' '
             script += '--bodyFile=' + xml_name + ' '
             script += '--bodyRot=1,0,0,0 '
             script += '--bodyTrans=0,0,0 '
@@ -266,7 +267,7 @@ if __name__ == '__main__':
     parser.add_argument('--root_path', default=os.path.dirname(os.path.realpath(__file__)))
     parser.add_argument('--object_xml_path', default='../vr_shapes')
     parser.add_argument('--robot_xml_path', default='graspitmodified_lm/graspit/models/robots/HumanHand/HumanHand20DOF.xml')
-    parser.add_argument('--built_binary_path', default='graspitmodified-build/graspit/graspit_cmdline')
+    parser.add_argument('--built_binary_path', default='~/graspitmodified-build/graspit/graspit_cmdline')
     parser.add_argument('--gen_scripts_path', default='batch')
     parser.add_argument('--final_result_path', default='output')
     parser.add_argument('--model_path', default='/home/liujian/WorkSpace/EBM_Result/models/model_21:22:48-Nov-30-2020/model_0.pkl')

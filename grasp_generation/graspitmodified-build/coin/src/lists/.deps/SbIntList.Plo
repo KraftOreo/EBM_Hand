@@ -1,5 +1,0 @@
-SbIntList.lo: \
- ../../../../graspitmodified_lm/Coin-3.1.3/src/lists/SbIntList.cpp \
- /usr/include/stdc-predef.h
-
-/usr/include/stdc-predef.h:

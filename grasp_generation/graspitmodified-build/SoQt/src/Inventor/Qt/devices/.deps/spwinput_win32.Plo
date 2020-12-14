@@ -1,6 +1,0 @@
-spwinput_win32.lo: ../../../../src/Inventor/Qt/devices/spwinput_win32.c \
- /usr/include/stdc-predef.h ../../../../src/config.h
-
-/usr/include/stdc-predef.h:
-
-../../../../src/config.h:
