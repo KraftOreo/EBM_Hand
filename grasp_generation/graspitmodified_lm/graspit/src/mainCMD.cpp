@@ -57,6 +57,7 @@
 #include "graspit/EGPlanner/egPlanner.h"
 #include "graspit/EGPlanner/searchState.h"
 #include "graspit/EGPlanner/simAnnPlanner.h"
+
 class SimAnnPlannerCMD : public SimAnnPlanner
 {
 public:

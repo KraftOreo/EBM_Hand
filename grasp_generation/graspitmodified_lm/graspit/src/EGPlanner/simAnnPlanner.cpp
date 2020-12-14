@@ -22,7 +22,6 @@
 // $Id: simAnnPlanner.cpp,v 1.16 2009/05/07 19:57:26 cmatei Exp $
 //
 //######################################################################
-
 #include "graspit/EGPlanner/simAnnPlanner.h"
 
 #include "graspit/EGPlanner/searchState.h"

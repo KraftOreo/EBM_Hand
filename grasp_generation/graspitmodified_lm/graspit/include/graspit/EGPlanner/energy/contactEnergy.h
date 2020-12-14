@@ -4,6 +4,7 @@
 
 #include "graspit/EGPlanner/energy/searchEnergy.h"
 #include <string.h>
+#include <vector>
 
 class ContactEnergy: public SearchEnergy
 {
@@ -16,8 +17,10 @@ class ContactEnergy: public SearchEnergy
    * @param numDOF number of DOF
    * @return double ebm energy value that is used to predict human-like grasping.
    */
-    double ebm_pythonInterface(double* dofVals, int numDOF,std::string modelPath) const;
-    double method1(double* dofVals, int numDOF, std::string modelPath) const;
+//     double ebm_pythonInterface(std::vector<double>& dofVals, int numDOF) const;
+    double method1(std::vector<double>& dofVals, int numDOF, std::string modelPath) const;
+//     int Initialize(std::string modelPath) const;
+//     void Uninitialize() const;
 };
 
 

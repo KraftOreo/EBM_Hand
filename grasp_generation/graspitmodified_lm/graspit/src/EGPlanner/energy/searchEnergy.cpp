@@ -22,7 +22,6 @@
 // $Id: searchEnergy.cpp,v 1.42 2009/09/13 19:57:38 hao Exp $
 //
 //######################################################################
-
 #include "graspit/EGPlanner/energy/searchEnergy.h"
 
 #include <time.h>

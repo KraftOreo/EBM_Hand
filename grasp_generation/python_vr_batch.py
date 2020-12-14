@@ -74,7 +74,7 @@ def gen_script_for_each_xml(root_path, robot_xml_path, xml_name, built_binary_pa
     if True:
         f = open(root_path + '/' + sub_path + '/run.sh', 'w')
         script = ''
-        num_run = 10 # The number of times the algorithm is called
+        num_run = 1 # The number of times the algorithm is called
         for j in range(num_run):
             if os.path.exists(root_path + '/' + sub_path + '/' + elements[len(elements)-1] + '_' + str(j)):
                 print('Detected Filefold: ' + root_path + '/' + sub_path + '/' + elements[len(elements)-1] + '_' + str(j))

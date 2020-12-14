@@ -1797,6 +1797,8 @@ graspit/EGPlanner/energy/searchEnergy.h
 /home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit/include/graspit/EGPlanner/energy/graspit/EGPlanner/energy/searchEnergy.h
 string.h
 -
+vector
+-
 
 /home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit/include/graspit/EGPlanner/energy/searchEnergy.h
 ostream
@@ -2021,6 +2023,8 @@ graspit/Collision/collisionStructures.h
 /home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit/src/EGPlanner/energy/contactEnergy.cpp
 Python.h
 -
+memory
+-
 graspit/EGPlanner/energy/contactEnergy.h
 /home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit/src/EGPlanner/energy/graspit/EGPlanner/energy/contactEnergy.h
 graspit/robot.h
@@ -2038,6 +2042,8 @@ graspit/quality/quality.h
 iostream
 -
 string.h
+-
+ctime
 -
 
 /home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit/src/qhull/libqhull/libqhull.h
