@@ -9,10 +9,14 @@ set(GRASPIT_VERSION
   ${GRASPIT_MAJOR_VERSION}.${GRASPIT_MINOR_VERSION}.${GRASPIT_PATCH_VERSION})
 
 #Add by Jian Liu
-find_package(Python3 COMPONENTS Development)
+find_package(Python3 COMPONENTS Interpreter Development)
+find_package(Torch COMPONENTS Interpreter Development) 
+MESSAGE("this python3 include directories = ${Python3_INCLUDE_DIRS}.")
+MESSAGE("this python3 lib directories = ${Python3_LIBRARY_DIRS}.")
+MESSAGE("this python3 libraries = ${Python3_LIBRARIES}.")
+MESSAGE("this python3 running lib dir = ${Python3_RUNTIME_LIBRARY_DIRS}")
 include_directories(${Python3_INCLUDE_DIRS})
-#include_directories(/usr/include/python3.7)
-#link_directories(/usr/lib/x86_64-linux-gnu)
+link_directories(${Python3_LIBRARY_DIRS})
 
 ####################################
 ## Define build type ###############
@@ -904,10 +908,13 @@ add_library(graspit SHARED ${GRASPIT_LIBRARY_SOURCES})
 set(SIMULATOR_SRC ${GSRC}/src/main.cpp)
 set(CMDLINE_SRC ${GSRC}/src/mainCMD.cpp)
 set(POS_REF_SRC ${GSRC}/src/main_pose_refine.cpp)
+#set(testCPP_SRC ${GSRC}/src/test.cpp)
 
 #add_executable(graspit_simulator ${SIMULATOR_SRC})
 add_executable(graspit_cmdline ${CMDLINE_SRC})
 add_executable(graspit_pose_refine ${POS_REF_SRC})
+#add_executable(testCPP ${testCPP_SRC})
+
 ## System libraries which are needed for graspit
 set(GRASPIT_LINK_LIBRARIES
    ${QT_LIBRARIES}
@@ -920,6 +927,8 @@ set(GRASPIT_LINK_LIBRARIES
    ${GUROBI_LIBRARIES}
    ${GUROBI_CPP_LIBRARIES}
 )
+
+## Add by Jian Liu
 set(GRASPIT_CMDLINE_LINK_LIBRARIES
    ${QT_LIBRARIES}
    ${QT_QT3SUPPORT_LIBRARY}
@@ -931,6 +940,7 @@ set(GRASPIT_CMDLINE_LINK_LIBRARIES
    ${GUROBI_LIBRARIES}
    ${GUROBI_CPP_LIBRARIES}
    ${Python3_LIBRARIES}
+   ${TORCH_LIBRARIES}
 )
 #message(STATUS "SoQT: ${SOQT_LIBRARY_RELEASE}")
 
@@ -939,6 +949,7 @@ target_link_libraries(graspit ${GRASPIT_CMDLINE_LINK_LIBRARIES})
 target_link_libraries(graspit_pose_refine graspit ${GRASPIT_CMDLINE_LINK_LIBRARIES})
 #target_link_libraries(graspit_simulator graspit ${GRASPIT_LINK_LIBRARIES})
 target_link_libraries(graspit_cmdline graspit ${GRASPIT_CMDLINE_LINK_LIBRARIES})
+#target_link_libraries(testCPP ${GRASPIT_CMDLINE_LINK_LIBRARIES})
 
 ## Set install destination paths
 set ( INCLUDE_DESTINATION ${CMAKE_INSTALL_PREFIX}/include/)

@@ -45,7 +45,7 @@
   The main call returns an exit code as indicated by the graspit GUI (0 by default)
   to provide feedback to calling program, if desired.
  */
-
+#include <Python.h>
 #include <iostream>
 #include <string.h>
 
@@ -211,9 +211,14 @@ int main(int argc, char **argv)
 {
   cmdline::parser parsed_args;
   parsed_args.add<std::string>("resultFile");
-  parsed_args.add<int>("maxStep",0,"",true, 40000);//70000
-  // Add by Jian Liu
-  parsed_args.add<std::string>("EGEnergy",0,"",true,"CONTACT_ENERGY");//CONTACT_ENERGY
+  parsed_args.add<int>("maxStep",0,"",true, 70000);//70000
+  
+  /**
+   * Note: Modify by Jian Liu
+   * Biref: Human-like grasp energy
+   * 
+   * */
+  parsed_args.add<std::string>("EGEnergy",0,"",true,"EBM_GUIDED_AUTO_GRASP_QUALITY_ENERGY");//CONTACT_ENERGY
   //parsed_args.add<std::string>("EGEnergy",0,"",true,"STRICT_AUTO_GRASP_ENERGY");
   parsed_args.parse(argc,argv);
 
@@ -275,7 +280,14 @@ int main(int argc, char **argv)
 //  oss << parsed_args.get<std::string>("resultFile").c_str()<< "grasp"  << ".xml";
 //  core.getWorld()->save(QString(oss.str().c_str()));
 
+  /**
+   * Note: Modify by Jian Liu
+   * Brief: To run python in C++, we initalize python objects in main function.
+   * */
+  Py_Initialize();
   planner.runCMD();
+  Py_Finalize();
+
   //show
   std::cout << "Found " << planner.getListSize() << " grasps!" << std::endl;
   if(planner.getListSize() == 0) {

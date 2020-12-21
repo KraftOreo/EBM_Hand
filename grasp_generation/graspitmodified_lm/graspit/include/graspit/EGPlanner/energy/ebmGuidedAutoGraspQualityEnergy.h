@@ -3,6 +3,7 @@
 
 #include "graspit/EGPlanner/energy/searchEnergy.h"
 #include <string.h>
+#include <vector>
 
 /**
  * @brief EBM-based energy
@@ -18,9 +19,10 @@ class EBMGuidedAutoGraspQualityEnergy: public SearchEnergy
    * 
    * @param dofVals DOF of hand
    * @param numDOF number of DOF
+   * @param modelPath The file path of ebm model
    * @return double ebm energy value that is used to predict human-like grasping.
    */
-    double ebm_pythonInterface(double* dofVals, int numDOF,std::string modelPath) const;
+    double ebm_pythonInterface(std::vector<double> &dofVals, int numDOF, std::string modelPath) const;
 };
 
 

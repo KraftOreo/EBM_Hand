@@ -1,4 +1,8 @@
 #include <Python.h>
+#include <memory>
+#include <iostream>
+#include <string.h>
+#include "graspit/EGPlanner/energy/contactEnergy.h"
 #include "graspit/EGPlanner/energy/ebmGuidedAutoGraspQualityEnergy.h"
 #include "graspit/robot.h"
 #include "graspit/grasp.h"
@@ -6,8 +10,7 @@
 #include "graspit/world.h"
 #include "graspit/contact/virtualContact.h"
 #include "graspit/quality/quality.h"
-#include <iostream>
-#include <string.h>
+
 /**
  * @brief This formulation combines virtual contact energy with autograsp energy. In addition, it computes EBM-based energy to access human-like grasping. 
     Virtual contact energy is used to "guide" initial stages of the search and to see if we should even bother computing autograsp quality. 
@@ -17,6 +20,13 @@
  * @author Jian Liu
  * 
  */
+
+PyObject *pModule = NULL;
+PyObject *pFunc = NULL;
+PyObject *pReturn = NULL;
+PyObject *list_dof = NULL;
+PyObject *pArgs = NULL;
+
 double
 EBMGuidedAutoGraspQualityEnergy::energy() const
 {
@@ -33,7 +43,10 @@ EBMGuidedAutoGraspQualityEnergy::energy() const
   //average error per contact
   VirtualContact *contact;
   vec3 p, n, cn;
-  double virtualError = 0; int closeContacts = 0;
+  double virtualError = 0.0;
+  int closeContacts = 0;
+  double ebmQuality = 0.0;
+  int numDof = mHand->getNumDOF();
   for (int i = 0; i < mHand->getGrasp()->getNumContacts(); i++)
   {
     contact = (VirtualContact *)mHand->getGrasp()->getContact(i);
@@ -49,111 +62,154 @@ EBMGuidedAutoGraspQualityEnergy::energy() const
     double d = 1 - cn.dot(n);
     virtualError += d * 100.0 / 2.0;
 
-    if (fabs(dist) < 20 && d < 0.3) { closeContacts++; }
+    if (fabs(dist) < 20 && d < 0.3)
+    {
+      closeContacts++;
+    }
   }
 
   virtualError /= mHand->getGrasp()->getNumContacts();
 
-  double *dofVals = new double[mHand->getNumDOF()];
+  double *dofVals = new double[numDof];
   mHand->getDOFVals(dofVals);
-  double ebmQuality = 0;
-  
-  //std::cout<<mHand->getNumDOF()<<std::endl;
+
+  std::vector<double> DOFs(numDof);
+  for (int i = 0; i < numDof; i++)
+  {
+    DOFs[i] = dofVals[i];
+  }
+  delete[] dofVals;
+  ebmQuality = this->ebm_pythonInterface(DOFs, numDof, mHand->getEBMPath());
+
+  //Test
+  // std::cout<<mHand->getNumDOF()<<std::endl;
   // for(int i=0;i<mHand->getNumDOF();i++){
   //   std::cout<<dofVals[i]<<std::endl;
   //   }
-  //std::cout<<mHand->getEBMPath()<<std::endl;
-  ebmQuality = ebm_pythonInterface(dofVals,mHand->getNumDOF(),mHand->getEBMPath());
-  
+  // std::cout<<mHand->getEBMPath()<<std::endl;
+  // if (this->Initialize(mHand->getEBMPath()) < 0)
+  // {
+  //   std::cout<< "Initialize is failed"<<std::endl;
+  // }
+  // ebmQuality = this->ebm_pythonInterface(DOFs,numDof);
+  // //virtualError = virtualError + ebmQuality * 1.0e3;
+  // this->Uninitialize();
+
   //if more than 2 links are "close" go ahead and compute the true quality
-  double volQuality = 0, epsQuality = 0;
-  if (closeContacts >= 2) 
+  double volQuality = 0.0, epsQuality = 0.0;
+  if (closeContacts >= 2)
   {
     mHand->autoGrasp(false, 1.0);
     //now collect the true contacts;
     mHand->getGrasp()->collectContacts();
-    if (mHand->getGrasp()->getNumContacts() >= 4) 
+    if (mHand->getGrasp()->getNumContacts() >= 4)
     {
       mHand->getGrasp()->updateWrenchSpaces();
       volQuality = mVolQual->evaluate();
       epsQuality = mEpsQual->evaluate();
-      if (epsQuality < 0) { epsQuality = 0; } //QM returns -1 for non-FC grasps
+      if (epsQuality < 0)
+      {
+        epsQuality = 0;
+      } //QM returns -1 for non-FC grasps
     }
 
     DBGP("Virtual error " << virtualError << " and " << closeContacts << " close contacts.");
     DBGP("Volume quality: " << volQuality << " Epsilon quality: " << epsQuality);
     DBGP("Human-like quality: " << ebmQuality);
   }
+  std::cout << "contact energy: " << virtualError << std::endl;
+  std::cout << "Volume energy: " << volQuality * 1.0e3 << std::endl;
+  std::cout << "ebm energy: " << ebmQuality * 1.0e2 << std::endl;
 
+  //The smaller value of ebm energy is , the more human-like the generated 20DOF human-hand grasp
+  //The soft constraint of grasp energy computation
   double q;
-  if (volQuality == 0) { q = virtualError + ebmQuality * 1.0e3; }
-  else { q = virtualError - volQuality * 1.0e3 + ebmQuality * 1.0e3; }
+  if (volQuality == 0) { q = virtualError + ebmQuality * 1.0e2; }
+  else { q = virtualError - volQuality * 1.0e3 + ebmQuality * 1.0e2; }
   if (volQuality || epsQuality) {DBGP("Final quality: " << q);}
 
-  //DBGP("Final value: " << q << std::endl);
+  //The solid constraint of grasp energy computation
+  DBGP("Final value: " << q << std::endl);
+  std::cout << "Final grasp energy value: " << q << std::endl;
   return q;
 }
 
 double
-EBMGuidedAutoGraspQualityEnergy::ebm_pythonInterface(double* dofVals, int numDOF, std::string modelPath) const
+EBMGuidedAutoGraspQualityEnergy::ebm_pythonInterface(std::vector<double> &dofVals, int numDOF, std::string modelPath) const
 {
-  Py_Initialize();
-  if (!Py_IsInitialized())
-	{
-		std::cout << "Failed to initialize" << std::endl;
-		return 0;
-	}
   PyRun_SimpleString("import sys");
-  // PyRun_SimpleString("sys.path.append('./')");//python脚本路径, 放在cpp的同一路径下
-  PyRun_SimpleString("sys.path.append('/home/liujian/WorkSpace/EBM_Hand/grasp_generation/graspitmodified_lm/graspit/src/EGPlanner/energy/')");//python脚本路径, 放在cpp的同一路径下
-  //PyRun_SimpleString("print(sys.path)");
-  PyRun_SimpleString("import ebmPythonInterface");
-
-  PyObject *pModule = NULL;
-  PyObject *pFunc = NULL;
-  PyObject *pDict = NULL;
-  pModule = PyImport_ImportModule("ebmPythonInterface");//Python文件名
+  //The file path of the ebmPythonInterface.py
+  PyRun_SimpleString("sys.path.append('/root/WorkSpace/EBM_Hand')");
+  pModule = PyImport_ImportModule("ebmPythonInterface");
 
   if (!pModule)
-	{
-		std::cout << "Cannot find ebmPythonInterface.py" << std::endl;
-    return 0;
-	}
-
-  pDict = PyModule_GetDict(pModule);//加载文件中的函数名
-	if (!pDict)
-	{
-		std::cout << "Cant find dictionary" << std::endl;
-		return 0;
-  }
-  
-	pFunc = PyDict_GetItemString(pDict, "dof_ebm");//根据函数名获得函数功能块，‘dof_ebm‘为Python中定义的函数名
-	if (!pFunc)
-	{
-		printf("Cant find Function. dof_ebm /n");
-    return 0;
-	}
-
-
-  pFunc = PyObject_GetAttrString(pModule, "dof_ebm"); //Python文件中的函数名
-  //创建参数:
-  PyObject *pArgs = PyTuple_New(2); //函数调用的参数传递均是以元组的形式打包的,2表示参数个数
-  PyObject *list_dof = PyList_New(0);
-
-  for(int i=0; i<numDOF; i++)
   {
-   PyList_Append(list_dof,Py_BuildValue("d",dofVals[i]*57.3));
+    std::cout << "pModle is null" << std::endl;
   }
-  
-  PyTuple_SetItem(pArgs,0,list_dof);
-  PyTuple_SetItem(pArgs,1,Py_BuildValue("s",modelPath.c_str()));
+
+  if (PyImport_ImportModule("ebmPythonInterface") == NULL || PyErr_Occurred())
+  {
+    PyErr_Print();
+  }
+
+  while (!pModule)
+  {
+    sleep(3.0);
+  }
+
+  if (!pModule)
+  {
+    std::cout << "Error: python module is null!" << std::endl;
+    return 0;
+  }
+  else
+  {
+    std::cout << "python module is successful" << std::endl;
+  }
+
+  pFunc = PyObject_GetAttrString(pModule, "dof_ebm");
+  if (!pFunc)
+  {
+    std::cout << "Error: python pFunc_dof_ebm is null!" << std::endl;
+    return 0;
+  }
+  else
+  {
+    std::cout << "python pFunc_dof_ebm is successful" << std::endl;
+  }
+
+  //创建参数:
+  pArgs = PyTuple_New(2); //函数调用的参数传递均是以元组的形式打包的,2表示参数个数
+  list_dof = PyList_New(0);
+
+  for (int i = 0; i < numDOF; i++)
+  {
+    double degVal = dofVals[i] * 57.3;
+    //std::cout<<degVal<<std::endl;
+    PyList_Append(list_dof, Py_BuildValue("d", degVal));
+  }
+
+  PyTuple_SetItem(pArgs, 0, list_dof);
+
+  PyTuple_SetItem(pArgs, 1, Py_BuildValue("s", modelPath.c_str()));
 
   //返回值
-  PyObject *pReturn = NULL;
   pReturn = PyEval_CallObject(pFunc, pArgs); //调用函数
   //将返回值转换为double类型
-  double result;
+  double result = 0.0;
   PyArg_Parse(pReturn, "d", &result); //d表示转换成double型变量
-  std::cout<<"ebm value: "<<result<<std::endl;
-  Py_Finalize();
+  std::cout << "ebm value: " << result << std::endl;
+
+  Py_DECREF(pArgs);
+  Py_DECREF(pModule);
+  Py_DECREF(pFunc);
+  Py_DECREF(list_dof);
+  Py_DECREF(pReturn);
+
+  pModule = NULL;
+  pFunc = NULL;
+  pReturn = NULL;
+  pArgs = NULL;
+  list_dof = NULL;
+  return result;
 }

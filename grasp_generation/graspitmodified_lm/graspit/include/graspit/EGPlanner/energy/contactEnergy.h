@@ -15,12 +15,10 @@ class ContactEnergy: public SearchEnergy
    * 
    * @param dofVals DOF of hand
    * @param numDOF number of DOF
+   * @param modelPath The file path of ebm model
    * @return double ebm energy value that is used to predict human-like grasping.
    */
-//     double ebm_pythonInterface(std::vector<double>& dofVals, int numDOF) const;
-    double method1(std::vector<double>& dofVals, int numDOF, std::string modelPath) const;
-//     int Initialize(std::string modelPath) const;
-//     void Uninitialize() const;
+  //  double method1(std::vector<double>& dofVals, int numDOF, std::string modelPath) const;
 };
 
 

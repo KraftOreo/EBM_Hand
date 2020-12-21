@@ -270,7 +270,8 @@ if __name__ == '__main__':
     parser.add_argument('--built_binary_path', default='~/graspitmodified-build/graspit/graspit_cmdline')
     parser.add_argument('--gen_scripts_path', default='batch')
     parser.add_argument('--final_result_path', default='output')
-    parser.add_argument('--model_path', default='/home/liujian/WorkSpace/EBM_Result/models/model_21:22:48-Nov-30-2020/model_0.pkl')
+    parser.add_argument('--model_path', default='/root/WorkSpace/EBM_Result/models/model_21:22:48-Nov-30-2020/model_0.pkl')
+    #parser.add_argument('--model_path', default='/home/liujian/WorkSpace/EBM_Result/models/model_21:22:48-Nov-30-2020/model_0.pkl')
     args = parser.parse_args()
     gen_all_scripts(args.testRun,
                     args.root_path,
