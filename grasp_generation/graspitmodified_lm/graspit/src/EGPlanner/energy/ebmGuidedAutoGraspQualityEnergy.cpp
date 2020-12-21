@@ -70,17 +70,6 @@ EBMGuidedAutoGraspQualityEnergy::energy() const
 
   virtualError /= mHand->getGrasp()->getNumContacts();
 
-  double *dofVals = new double[numDof];
-  mHand->getDOFVals(dofVals);
-
-  std::vector<double> DOFs(numDof);
-  for (int i = 0; i < numDof; i++)
-  {
-    DOFs[i] = dofVals[i];
-  }
-  delete[] dofVals;
-  ebmQuality = this->ebm_pythonInterface(DOFs, numDof, mHand->getEBMPath());
-
   //Test
   // std::cout<<mHand->getNumDOF()<<std::endl;
   // for(int i=0;i<mHand->getNumDOF();i++){
@@ -107,10 +96,22 @@ EBMGuidedAutoGraspQualityEnergy::energy() const
       mHand->getGrasp()->updateWrenchSpaces();
       volQuality = mVolQual->evaluate();
       epsQuality = mEpsQual->evaluate();
+
       if (epsQuality < 0)
       {
         epsQuality = 0;
       } //QM returns -1 for non-FC grasps
+
+      double *dofVals = new double[numDof];
+      mHand->getDOFVals(dofVals);
+
+      std::vector<double> DOFs(numDof);
+      for (int i = 0; i < numDof; i++)
+      {
+        DOFs[i] = dofVals[i];
+      }
+      delete[] dofVals;
+      ebmQuality = this->ebm_pythonInterface(DOFs, numDof, mHand->getEBMPath());
     }
 
     DBGP("Virtual error " << virtualError << " and " << closeContacts << " close contacts.");
@@ -119,14 +120,44 @@ EBMGuidedAutoGraspQualityEnergy::energy() const
   }
   std::cout << "contact energy: " << virtualError << std::endl;
   std::cout << "Volume energy: " << volQuality * 1.0e3 << std::endl;
-  std::cout << "ebm energy: " << ebmQuality * 1.0e2 << std::endl;
+  std::cout << "ebm energy: " << ebmQuality << std::endl;
 
   //The smaller value of ebm energy is , the more human-like the generated 20DOF human-hand grasp
   //The soft constraint of grasp energy computation
   double q;
-  if (volQuality == 0) { q = virtualError + ebmQuality * 1.0e2; }
-  else { q = virtualError - volQuality * 1.0e3 + ebmQuality * 1.0e2; }
-  if (volQuality || epsQuality) {DBGP("Final quality: " << q);}
+  if (ebmQuality >= 0.5)
+  {
+    if (volQuality == 0)
+    {
+      q = virtualError + ebmQuality;
+    }
+    else
+    {
+      q = virtualError - volQuality * 1.0e3 + ebmQuality;
+    }
+  }
+  else if (ebmQuality >= 0 && ebmQuality < 0.5)
+  {
+    if (volQuality == 0)
+    {
+      q = virtualError + ebmQuality;
+    }
+    else
+    {
+      q = virtualError - volQuality * 1.0e3 + ebmQuality;
+    }
+  }
+  else
+  {
+    if (volQuality == 0)
+    {
+      q = virtualError + ebmQuality;
+    }
+    else
+    {
+      q = virtualError - volQuality * 1.0e3 + ebmQuality;
+    }
+  }
 
   //The solid constraint of grasp energy computation
   DBGP("Final value: " << q << std::endl);
