@@ -61,12 +61,15 @@
 class SimAnnPlannerCMD : public SimAnnPlanner
 {
 public:
-  SimAnnPlannerCMD(Hand* h):SimAnnPlanner(h){}
-  bool runCMD() {
-    bool done=false;
-    while(!done) {
-      PlannerState s=getState();
-      switch(s) {
+  SimAnnPlannerCMD(Hand *h) : SimAnnPlanner(h) {}
+  bool runCMD()
+  {
+    bool done = false;
+    while (!done)
+    {
+      PlannerState s = getState();
+      switch (s)
+      {
       case STARTING_THREAD: //do nothing
         break;
       case INIT:
@@ -84,201 +87,223 @@ public:
       case EXITED: //Do nothing
         break;
       }
-      if(!done && checkTerminationConditions())
+      if (!done && checkTerminationConditions())
         break;
-      if(getCurrentStep()%200 == 0)
+      if (getCurrentStep() % 200 == 0)
         std::cout << "Run " << getCurrentStep() << "/" << mMaxSteps << std::endl;
     }
     setState(EXITED);
     return done;
   }
 };
-transf loadTransf(const cmdline::parser& parser,const std::string& rot,const std::string& trans)
+transf loadTransf(const cmdline::parser &parser, const std::string &rot, const std::string &trans)
 {
   transf tf;
-  Quaternion q=Quaternion::Identity();
-  vec3 t=vec3::Zero();
-  if(parser.exist(rot)) {
-    std::string val=parser.get<std::string>(rot);
-    std::replace(val.begin(),val.end(),',',' ');
+  Quaternion q = Quaternion::Identity();
+  vec3 t = vec3::Zero();
+  if (parser.exist(rot))
+  {
+    std::string val = parser.get<std::string>(rot);
+    std::replace(val.begin(), val.end(), ',', ' ');
     std::istringstream(val) >> q.w() >> q.x() >> q.y() >> q.z();
   }
-  if(parser.exist(trans)) {
-    std::string val=parser.get<std::string>(trans);
-    std::replace(val.begin(),val.end(),',',' ');
+  if (parser.exist(trans))
+  {
+    std::string val = parser.get<std::string>(trans);
+    std::replace(val.begin(), val.end(), ',', ' ');
     std::istringstream(val) >> t.x() >> t.y() >> t.z();
   }
-  tf.set(q,t);
+  tf.set(q, t);
   return tf;
 }
 
-
-std::string loadModel(int argc, char** argv)
+std::string loadModel(int argc, char **argv)
 {
   cmdline::parser parsed_args;
   parsed_args.add<std::string>("modelPath");
   parsed_args.parse(argc, argv);
-  if(parsed_args.exist("modelPath")){
+  if (parsed_args.exist("modelPath"))
+  {
     std::string modelPath = parsed_args.get<std::string>("modelPath");
     // should initialize the optimizer with model path
     return modelPath;
   }
-  else{
+  else
+  {
     std::cout << "Cannot find modelPath!" << std::endl;
-    exit(EXIT_FAILURE);}
+    exit(EXIT_FAILURE);
+  }
 }
 
-void loadBodyFile(GraspitCore& core,int argc,char **argv)
+void loadBodyFile(GraspitCore &core, int argc, char **argv)
 {
   cmdline::parser parsed_args;
   parsed_args.add<std::string>("bodyFile");
   parsed_args.add<std::string>("bodyRot");
   parsed_args.add<std::string>("bodyTrans");
 
-  parsed_args.parse(argc,argv);
-  World* world=core.getWorld();
-  if(parsed_args.exist("bodyFile")) {
-    std::string file=parsed_args.get<std::string>("bodyFile");
-    if(file.length() > 4) {
-      Body* body=world->importBody("GraspableBody",QString(file.c_str()));
-      if(!body) {
+  parsed_args.parse(argc, argv);
+  World *world = core.getWorld();
+  if (parsed_args.exist("bodyFile"))
+  {
+    std::string file = parsed_args.get<std::string>("bodyFile");
+    if (file.length() > 4)
+    {
+      Body *body = world->importBody("GraspableBody", QString(file.c_str()));
+      if (!body)
+      {
         std::cout << "Cannot load bodyFile: " << file << std::endl;
         exit(EXIT_FAILURE);
       }
-      transf bodyTrans=loadTransf(parsed_args,"bodyRot","bodyTrans");
+      transf bodyTrans = loadTransf(parsed_args, "bodyRot", "bodyTrans");
       body->setTran(bodyTrans);
-    } else {
+    }
+    else
+    {
       std::cout << "Invalid bodyFile!" << std::endl;
       exit(EXIT_FAILURE);
     }
-  } else {
+  }
+  else
+  {
     std::cout << "Cannot find bodyFile!" << std::endl;
     exit(EXIT_FAILURE);
   }
 }
-void loadRobotFile(GraspitCore& core,int argc,char **argv)
+void loadRobotFile(GraspitCore &core, int argc, char **argv)
 {
   cmdline::parser parsed_args;
   parsed_args.add<std::string>("robotFile");
   parsed_args.add<std::string>("robotRot");
   parsed_args.add<std::string>("robotTrans");
   parsed_args.add<std::string>("robotDOF");
-  parsed_args.parse(argc,argv);
-  World* world=core.getWorld();
-  if(parsed_args.exist("robotFile")) {
-    std::string file=parsed_args.get<std::string>("robotFile");
-    if(file.length() > 4) {
+  parsed_args.parse(argc, argv);
+  World *world = core.getWorld();
+  if (parsed_args.exist("robotFile"))
+  {
+    std::string file = parsed_args.get<std::string>("robotFile");
+    if (file.length() > 4)
+    {
       QString pathQ(file.c_str());
-      Robot* robot=world->importRobot(pathQ);
-      if(!robot) {
+      Robot *robot = world->importRobot(pathQ);
+      if (!robot)
+      {
         std::cout << "Cannot load robotFile: " << file << std::endl;
         exit(EXIT_FAILURE);
       }
-      transf robotTrans=loadTransf(parsed_args,"robotRot","robotTrans");
+      transf robotTrans = loadTransf(parsed_args, "robotRot", "robotTrans");
       robot->setTran(robotTrans);
-      if(parsed_args.exist("robotDOF")) {
-        std::string val=parsed_args.get<std::string>("robotDOF");
-        std::replace(val.begin(),val.end(),',',' ');
+      if (parsed_args.exist("robotDOF"))
+      {
+        std::string val = parsed_args.get<std::string>("robotDOF");
+        std::replace(val.begin(), val.end(), ',', ' ');
         QString valQ(val.c_str());
         QTextStream is(&valQ);
         robot->readDOFVals(is);
       }
-    } else {
+    }
+    else
+    {
       std::cout << "Invalid robotFile!" << std::endl;
       exit(EXIT_FAILURE);
     }
-  } else {
+  }
+  else
+  {
     std::cout << "Cannot find robotFile!" << std::endl;
     exit(EXIT_FAILURE);
   }
 }
-int countContacts(Hand* h)
+int countContacts(Hand *h)
 {
-  int nrCT=0;
-  std::list<Contact*> cc=h->getContacts();
-  for(std::list<Contact*>::const_iterator beg=cc.begin(),end=cc.end(); beg!=end; beg++) {
-    Contact* ct=*beg;
-    if(dynamic_cast<GraspableBody*>(ct->getBody1()) && !dynamic_cast<GraspableBody*>(ct->getBody2()))
+  int nrCT = 0;
+  std::list<Contact *> cc = h->getContacts();
+  for (std::list<Contact *>::const_iterator beg = cc.begin(), end = cc.end(); beg != end; beg++)
+  {
+    Contact *ct = *beg;
+    if (dynamic_cast<GraspableBody *>(ct->getBody1()) && !dynamic_cast<GraspableBody *>(ct->getBody2()))
       nrCT++;
-    else if(dynamic_cast<GraspableBody*>(ct->getBody2()) && !dynamic_cast<GraspableBody*>(ct->getBody1()))
+    else if (dynamic_cast<GraspableBody *>(ct->getBody2()) && !dynamic_cast<GraspableBody *>(ct->getBody1()))
       nrCT++;
   }
   return nrCT;
 }
-typedef char* ARG;
+typedef char *ARG;
 std::string output_path;
 int main(int argc, char **argv)
 {
   cmdline::parser parsed_args;
   parsed_args.add<std::string>("resultFile");
-  parsed_args.add<int>("maxStep",0,"",true, 70000);//70000
-  
+  parsed_args.add<int>("maxStep", 0, "", true, 70000); //70000
+
   /**
    * Note: Modify by Jian Liu
    * Biref: Human-like grasp energy
    * 
    * */
-  parsed_args.add<std::string>("EGEnergy",0,"",true,"EBM_GUIDED_AUTO_GRASP_QUALITY_ENERGY");//CONTACT_ENERGY
+  parsed_args.add<std::string>("EGEnergy", 0, "", true, "EBM_GUIDED_AUTO_GRASP_QUALITY_ENERGY"); //CONTACT_ENERGY
   //parsed_args.add<std::string>("EGEnergy",0,"",true,"STRICT_AUTO_GRASP_ENERGY");
-  parsed_args.parse(argc,argv);
+  parsed_args.parse(argc, argv);
 
-  std::cout<<parsed_args.get<std::string>("resultFile").c_str();
+  std::cout << parsed_args.get<std::string>("resultFile").c_str();
   //std::string output_path;
   output_path.assign(parsed_args.get<std::string>("resultFile").c_str());
 
   //create core
-  int argc_tmp=2;
-  ARG argv_tmp[2]= {
-    (char*)"graspit",
-    (char*)"--headless"
-  };
-  GraspitCore core(argc_tmp,argv_tmp);
+  int argc_tmp = 2;
+  ARG argv_tmp[2] = {
+      (char *)"graspit",
+      (char *)"--headless"};
+  GraspitCore core(argc_tmp, argv_tmp);
   //load
-  loadBodyFile(core,argc,argv);
-  loadRobotFile(core,argc,argv);
+  loadBodyFile(core, argc, argv);
+  loadRobotFile(core, argc, argv);
   std::string modelPath = loadModel(argc, argv);
   //std::cout<<modelPath;
 
   //planner
-  if(core.getWorld()->getNumGB() == 0) {
+  if (core.getWorld()->getNumGB() == 0)
+  {
     std::cout << "World has no graspable objects!" << std::endl;
     exit(EXIT_FAILURE);
   }
   //state
   GraspPlanningState state(core.getWorld()->getCurrentHand());
-  state.setPositionType(SPACE_AXIS_ANGLE);
+  state.setPositionType(SPACE_COMPLETE);//SPACE_AXIS_ANGLE
   state.setObject(core.getWorld()->getGB(0));
   state.setRefTran(core.getWorld()->getGB(0)->getTran());
   state.reset();
 
   //planner
-  Hand* hand = core.getWorld()->getCurrentHand();
+  Hand *hand = core.getWorld()->getCurrentHand();
   hand->setEBMPath(modelPath);
   SimAnnPlannerCMD planner(hand);
 
   planner.setModelState(&state);
-  std::string energy=parsed_args.get<std::string>("EGEnergy");
-  if(energy == "CONTACT_ENERGY" || energy == "POTENTIAL_QUALITY_ENERGY" || 
-     energy == "EBM_GUIDED_AUTO_GRASP_QUALITY_ENERGY" || energy == "AUTO_GRASP_QUALITY_ENERGY" || 
-     energy == "GUIDED_POTENTIAL_QUALITY_ENERGY" || energy == "GUIDED_AUTO_GRASP_QUALITY_ENERGY" || 
-     energy == "STRICT_AUTO_GRASP_ENERGY" || energy == "COMPLIANT_ENERGY" || energy == "DYNAMIC_AUTO_GRASP_ENERGY")
+  std::string energy = parsed_args.get<std::string>("EGEnergy");
+  if (energy == "CONTACT_ENERGY" || energy == "POTENTIAL_QUALITY_ENERGY" ||
+      energy == "EBM_GUIDED_AUTO_GRASP_QUALITY_ENERGY" || energy == "AUTO_GRASP_QUALITY_ENERGY" ||
+      energy == "GUIDED_POTENTIAL_QUALITY_ENERGY" || energy == "GUIDED_AUTO_GRASP_QUALITY_ENERGY" ||
+      energy == "STRICT_AUTO_GRASP_ENERGY" || energy == "COMPLIANT_ENERGY" || energy == "DYNAMIC_AUTO_GRASP_ENERGY")
     planner.setEnergyType(energy);
-  else {
+  else
+  {
     std::cout << "Unknown energy type: " << energy << std::endl;
     exit(EXIT_FAILURE);
   }
-  planner.setContactType(CONTACT_PRESET);//CONTACT_LIVE
+  planner.setContactType(CONTACT_PRESET); //CONTACT_LIVE
   planner.setMaxSteps(parsed_args.get<int>("maxStep"));
-  if(!planner.resetPlanner()) {
+  if (!planner.resetPlanner())
+  {
     std::cout << "Error reset EGPlanner!" << std::endl;
     exit(EXIT_FAILURE);
   }
   planner.startPlanner();
 
-//  std::ostringstream oss;
-// // oss << "grasp" << i << "_" << parsed_args.get<std::string>("resultFile").c_str();
-//  oss << parsed_args.get<std::string>("resultFile").c_str()<< "grasp"  << ".xml";
-//  core.getWorld()->save(QString(oss.str().c_str()));
+  //  std::ostringstream oss;
+  // // oss << "grasp" << i << "_" << parsed_args.get<std::string>("resultFile").c_str();
+  //  oss << parsed_args.get<std::string>("resultFile").c_str()<< "grasp"  << ".xml";
+  //  core.getWorld()->save(QString(oss.str().c_str()));
 
   /**
    * Note: Modify by Jian Liu
@@ -290,27 +315,37 @@ int main(int argc, char **argv)
 
   //show
   std::cout << "Found " << planner.getListSize() << " grasps!" << std::endl;
-  if(planner.getListSize() == 0) {
+  if (planner.getListSize() == 0)
+  {
     std::cout << "SimAnnPlanner cannot find any grasp!" << std::endl;
     exit(EXIT_FAILURE);
   }
   //Note: first four grasp candidates (20%) have smaller energy, we just choose the first four grasps. planner.getListSize()
-  for(int i=0; i<planner.getListSize(); i++) {
-    const GraspPlanningState* state=planner.getGrasp(i);
+  for (int i = 0; i < 4; i++)
+  {
+    const GraspPlanningState *state = planner.getGrasp(i);
+    std::cout<<"Grasp energy = "<< state->getEnergy() << std::endl;
     state->execute();
+
     //auto-grasp
-    core.getWorld()->getCurrentHand()->autoGrasp(false,1.0);
+    core.getWorld()->getCurrentHand()->autoGrasp(false, 1.0);
     core.getWorld()->updateGrasps();
-    Hand* h=core.getWorld()->getCurrentHand();
-    if(countContacts(h) < 3) {
-      std::cout << "Skipping " << i << "th grasp!" << std::endl;
-      continue;
-    } else std::cout << "Number of contacts " << countContacts(h) << std::endl;
+    Hand *h = core.getWorld()->getCurrentHand();
+    
+    if (countContacts(h) < 2)
+    {
+     std::cout << "Skipping " << i << "th grasp!" << std::endl;
+     continue;
+   }
+    else
+     std::cout << "Number of contacts " << countContacts(h) << std::endl;
+    
     //save
-    if(parsed_args.exist("resultFile")) {
+    if (parsed_args.exist("resultFile"))
+    {
       std::ostringstream oss;
-     // oss << "grasp" << i << "_" << parsed_args.get<std::string>("resultFile").c_str();
-      oss << parsed_args.get<std::string>("resultFile").c_str()<< "grasp" << i << ".xml";
+      // oss << "grasp" << i << "_" << parsed_args.get<std::string>("resultFile").c_str();
+      oss << parsed_args.get<std::string>("resultFile").c_str() << "grasp" << i << ".xml";
       core.getWorld()->save(QString(oss.str().c_str()));
     }
   }

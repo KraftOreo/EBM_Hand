@@ -7,7 +7,6 @@
 
 double StrictAutoGraspEnergy::energy() const
 {
-  //  double gq = autograspQualityEnergy();
   double gq = approachAutograspQualityEnergy();
   if (gq == 0) { return 1.0e8; }
   else { return gq; }

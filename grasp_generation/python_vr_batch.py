@@ -32,7 +32,9 @@ def mkdir(path):
 
 
 def filterFiles(folder, exts, list):
-    for fileName in os.listdir(folder):
+    filenames = os.listdir(folder)
+    filenames.sort(key=lambda x:int(x[:-4]))
+    for fileName in filenames:
         if os.path.isdir(folder + '/' + fileName):
             filterFiles(folder + '/' + fileName, exts, list)
         elif anyTrue(fileName.endswith, exts):
@@ -250,15 +252,14 @@ def gen_all_scripts(testRun, root_path, object_xml_path, robot_xml_path, built_b
 
     xml_file_list = []
     filterFiles(root_path + '/' + object_xml_path, '.xml', xml_file_list)
-    # print(xml_file_list)
-    # print(sorted(xml_file_list))
-    # exit(1)
+    #print(xml_file_list)
+    #print(sorted(xml_file_list))
+    #exit(1)
 
-    gen_script_for_each_xml(root_path, robot_xml_path, xml_file_list[0], built_binary_path, gen_scripts_path, final_result_path, model_path=model_path)
+    #gen_script_for_each_xml(root_path, robot_xml_path, xml_file_list[0], built_binary_path, gen_scripts_path, final_result_path, model_path=model_path)
 
-    # for i in range(len(xml_file_list)):
-    #    gen_script_for_each_xml(root_path, robot_xml_path, xml_file_list[i], built_binary_path,
-    #                                  gen_scripts_path, final_result_path, model_path=None)
+    for i in range(len(xml_file_list)):
+        gen_script_for_each_xml(root_path, robot_xml_path, xml_file_list[i], built_binary_path, gen_scripts_path, final_result_path, model_path=model_path)
 
 
 if __name__ == '__main__':

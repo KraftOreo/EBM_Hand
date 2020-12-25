@@ -10,10 +10,19 @@
  * @author Jian Liu
  * 
  */
-class EBMGuidedAutoGraspQualityEnergy: public SearchEnergy
+class EBMGuidedAutoGraspQualityEnergy : public SearchEnergy
 {
-  public:
-    double energy() const;
+public:
+  double energy() const;
+  //bool legal() const;
+
+protected:
+  double potentialQualityEnergy() const;
+  double contactEnergy(int& closeContacts) const;
+  double autograspQualityEnergy() const;
+  double approachAutograspQualityEnergy() const;
+  double potentialQualityScalingFunction(double dist, double cosTheta) const;
+  double ebmEnergy() const;
   /**
    * @brief An interface to run EBM model.
    * 
@@ -22,8 +31,7 @@ class EBMGuidedAutoGraspQualityEnergy: public SearchEnergy
    * @param modelPath The file path of ebm model
    * @return double ebm energy value that is used to predict human-like grasping.
    */
-    double ebm_pythonInterface(std::vector<double> &dofVals, int numDOF, std::string modelPath) const;
+  double ebm_pythonInterface(std::vector<double> &dofVals, int numDOF, std::string modelPath) const;
 };
-
 
 #endif

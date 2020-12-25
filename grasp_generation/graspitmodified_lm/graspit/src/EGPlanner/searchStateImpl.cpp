@@ -107,6 +107,11 @@ void PostureStateEigen::storeHandDOF(const double *dof)
 
 void PositionStateComplete::createVariables()
 {
+  //Note: Modified by Jian Liu for multi-scale object
+  // mVariables.push_back(new SearchVariable("Tx", -350, 350, 0, 100));
+  // mVariables.push_back(new SearchVariable("Ty", -600, 600, 0, 100));
+  // mVariables.push_back(new SearchVariable("Tz", -450, 450, 350, 100));
+
   mVariables.push_back(new SearchVariable("Tx", -250, 250, 0, 100));
   mVariables.push_back(new SearchVariable("Ty", -250, 250, 0, 100));
   mVariables.push_back(new SearchVariable("Tz", -250, 250, 250, 100));
@@ -146,6 +151,11 @@ void PositionStateComplete::setTran(const transf &t)
 
 void PositionStateAA::createVariables()
 {
+  //Note: Modified by Jian Liu for multi-scale object
+  // mVariables.push_back(new SearchVariable("Tx", -350, 350, 0, 150));
+  // mVariables.push_back(new SearchVariable("Ty", -600, 600, 0, 150));
+  // mVariables.push_back(new SearchVariable("Tz", -450, 450, 350, 150));
+
   mVariables.push_back(new SearchVariable("Tx", -250, 250, 0, 150));
   mVariables.push_back(new SearchVariable("Ty", -250, 250, 0, 150));
   mVariables.push_back(new SearchVariable("Tz", -250, 350, 350, 150));
